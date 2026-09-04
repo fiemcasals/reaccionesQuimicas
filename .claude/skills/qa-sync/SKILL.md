@@ -32,6 +32,11 @@ archivo de rutas). Sin argumentos, trabaja sobre todos los Requerimientos del pr
 
 ---
 
+**Qué podés escribir y qué endpoints tenés está en `scrumDocs/roles/qa.md`**, generado desde el código del servidor. Este skill es el procedimiento; si los dos se
+contradicen, manda el documento del rol.
+
+---
+
 ## 0. Identidad y credenciales
 
 - `SCRUM_API_KEY` — variable de entorno, para la cuenta con rol Tester o QA. Si falta,
@@ -55,11 +60,11 @@ está en `scrumDocs/SCRUM_MASTER_AI.md`, paso 5.
 
 ## 1. Leer o inicializar el manifest de trazabilidad
 
-Leer `scrumDocs/scrum-manifest.json` (el mismo que usa `/scrum-sync`, sólo para `apiUrl` y
+Leer `scrumDocs/scrum-manifest.json` (el mismo que usa `/dev-sync`, sólo para `apiUrl` y
 `projectId` — no tocar sus `mappings`, son del developer). Si no está ahí pero existe `docs/scrum-manifest.json` (ubicación anterior a `scrumDocs/`), leerlo de ahí y reescribirlo ya en `scrumDocs/scrum-manifest.json` — el archivo viejo se deja donde está, no se borra.
 
 Si no existe en ninguno de los dos lugares, crearlo con el mismo formato que usa
-`/scrum-sync` (`apiUrl`, `projectId`, `lastSyncAt`, `mappings`).
+`/dev-sync` (`apiUrl`, `projectId`, `lastSyncAt`, `mappings`).
 
 - **`apiUrl`**: no es secreta — si el archivo ya la trae, usarla y no volver a preguntar;
   si falta, antes de preguntarla revisar si existe `scrumDocs/SCRUM_MASTER_AI.md` (el Project
@@ -78,8 +83,8 @@ curl -s "$SCRUM_API_URL/api/v1/me" -H "Authorization: Bearer $SCRUM_API_KEY"
   Manager, y parar.
 - `200` → `{ id, username, email, role, projects: [{ id, name }, ...] }` — esto determina
   el rol de verdad, **nunca preguntarle al usuario "qué rol sos" ni asumirlo**.
-  - Si `role` no es `tester` ni `qa`, avisar que esta key no corresponde a este skill
-    (`/po-sync` es para `product_owner`, `/scrum-sync` para `developer`) y sugerir el
+  - Si `role` no es `qa`, avisar que esta key no corresponde a este skill
+    (`/po-sync` es para `product_owner`, `/dev-sync` para `developer`) y sugerir el
     correcto.
   - Si el manifest no tenía `projectId`: un solo elemento en `projects` → usarlo directo;
     varios → listar y preguntar; vacío → avisar que el Project Manager todavía no agregó
@@ -126,7 +131,7 @@ dejalo afuera y reportalo en el resumen final.
 Si el archivo todavía está en `docs/tests-manifest.json` (ubicación anterior a
 `scrumDocs/`), leerlo de ahí y reescribirlo ya en `scrumDocs/`.
 
-Formato (ver también la sección correspondiente en el skill `/scrum-sync`, que es quien
+Formato (ver también la sección correspondiente en el skill `/dev-sync`, que es quien
 originalmente lee este archivo desde el lado del developer):
 
 ```json
@@ -164,7 +169,7 @@ originalmente lee este archivo desde el lado del developer):
 
 ## 5. Sincronizar con la API
 
-Igual que el paso 5 de `/scrum-sync`, pero corriéndolo vos mismo como Tester/QA en vez de
+Igual que el paso 5 de `/dev-sync`, pero corriéndolo vos mismo como Tester/QA en vez de
 delegarlo:
 
 - Resolver `requirementCode` contra la lista del paso 2 (por `code`, nunca por nombre).
