@@ -1,6 +1,6 @@
 # Historias de Usuario -- simulador quimico
 
-_Generado automaticamente el 2026-08-27T01:44:11.897Z -- no editar a mano, se sobreescribe en cada publicacion._
+_Generado automaticamente el 2026-09-04T13:59:48.821Z -- no editar a mano, se sobreescribe en cada publicacion._
 
 ## HU-01: Simulación de Disoluciones (C1*V1 = C2*V2)
 
