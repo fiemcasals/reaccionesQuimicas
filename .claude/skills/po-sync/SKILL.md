@@ -1,6 +1,6 @@
 ---
 name: po-sync
-description: Sincroniza lo que el Product Owner (o el Project Manager, mismo alcance de API) redacta en este repo -- documentos en lenguaje natural, no un formato rígido -- con las Historias de Usuario y los Requerimientos de un proyecto en Scrum Master AI. Lee scrumDocs/historias-po.md para crear/editar/borrar Historias de Usuario. Lee scrumDocs/requerimientos-po.md para editar o borrar Requerimientos ya existentes colgados de esas Historias, lo que requiere una key de Project Manager: la API le responde 403 a un Product Owner. Crear un Requerimiento nuevo es territorio de /scrum-sync (Project Manager/Scrum Master), este skill sólo reporta los que faltan. Nunca toca tests, tiempos, ramas ni estados de ejecución. Usar cuando el usuario pide "sincronizar requerimientos", "cargar historias de usuario", "cargar lo que escribí como Product Owner", "actualizar el backlog", "borrar una historia/requerimiento", o corre /po-sync explícitamente.
+description: Sincroniza lo que el Product Owner (o el Project Manager, mismo alcance de API) redacta en este repo -- documentos en lenguaje natural, no un formato rígido -- con las Historias de Usuario y los Requerimientos de un proyecto en Scrum Master AI. Lee scrumDocs/historias-po.md para crear/editar/borrar Historias de Usuario. Lee scrumDocs/requerimientos-po.md para editar o borrar Requerimientos ya existentes colgados de esas Historias, lo que requiere una key de Project Manager: la API le responde 403 a un Product Owner. Crear un Requerimiento nuevo es territorio de /dev-sync (Project Manager/Scrum Master), este skill sólo reporta los que faltan. Nunca toca tests, tiempos, ramas ni estados de ejecución. Usar cuando el usuario pide "sincronizar requerimientos", "cargar historias de usuario", "cargar lo que escribí como Product Owner", "actualizar el backlog", "borrar una historia/requerimiento", o corre /po-sync explícitamente.
 user-invocable: true
 allowed-tools:
   - Read
@@ -20,7 +20,7 @@ Los compara contra lo que ya existe en Scrum Master AI y sincroniza ambos nivele
 
 **Alcance**: este skill crea/edita/borra Historias de Usuario (nombre, descripción,
 criterios de aceptación, detalle técnico). **Crear un Requerimiento nuevo no es territorio
-de este skill**: eso lo hace el Project Manager o el Scrum Master con `/scrum-sync`; acá
+de este skill**: eso lo hace el Project Manager con `/pm-sync` o el Scrum Master con `/sm-sync`; acá
 sólo se reporta al final cuál falta crear y bajo qué Historia.
 
 **Sobre los Requerimientos ya existentes, lo que la key puede hacer depende del rol** — no
@@ -29,7 +29,12 @@ alcanza con que este documento lo describa:
 | | Historias de Usuario | Requerimientos existentes | Crear Requerimiento |
 |---|---|---|---|
 | key de `product_owner` | crea, edita, borra | **nada: la API responde 403** | no |
-| key de `project_manager` | crea, edita, borra | edita y borra | sí, pero con `/scrum-sync` |
+| key de `project_manager` | crea, edita, borra | edita y borra | sí, pero con `/pm-sync` |
+
+El alcance completo de cada uno de los dos roles -- campos, estados y endpoints, generados
+desde el código del servidor -- está en `scrumDocs/roles/product-owner.md` y
+`scrumDocs/roles/project-manager.md`. Este skill es el procedimiento, no la fuente de los
+permisos: si los dos se contradicen, manda el documento del rol.
 
 O sea: con una key de Product Owner, los pasos 4 y 4.5 no aplican -- el Requerimiento que
 haya que tocar se reporta en el resumen final para que lo haga el PM o el Scrum Master. Con
@@ -80,7 +85,7 @@ está en `scrumDocs/SCRUM_MASTER_AI.md`, paso 5.
 ## 1. Leer o inicializar el manifest
 
 Leer `scrumDocs/po-manifest.json` en la raíz del repo (es propio de este skill, no el mismo que
-usa `/scrum-sync` para developer — ese guarda referencias a código; este guarda
+usa `/dev-sync` para developer — ese guarda referencias a código; este guarda
 referencias a secciones de este documento). Si no está ahí pero existe `docs/po-manifest.json` (ubicación anterior a `scrumDocs/`), leerlo de ahí y reescribirlo ya en `scrumDocs/po-manifest.json` — el archivo viejo se deja donde está, no se borra.
 
 Si no existe en ninguno de los dos lugares, crear:
@@ -123,8 +128,8 @@ curl -s "$SCRUM_API_URL/api/v1/me" -H "Authorization: Bearer $SCRUM_API_KEY"
   el rol de la cuenta dueña de la key es el único que importa (y la API lo vuelve a
   validar en cada llamada de todos modos).
   - Si `role` no es `product_owner` ni `project_manager`, avisar que esta key no
-    corresponde a este skill (`/scrum-sync` es para `developer`, `/qa-sync` para
-    `tester`/`qa`) y sugerir el correcto en vez de seguir adelante.
+    corresponde a este skill (`/dev-sync` es para `developer`, `/qa-sync` para
+    `qa`) y sugerir el correcto en vez de seguir adelante.
   - Si el manifest no tenía `projectId`: con un solo elemento en `projects`, usar ese `id`
     directo; con varios, listarlos y preguntar cuál; vacío, avisar que el Project Manager
     todavía no agregó a este usuario a ningún proyecto, y parar. Guardar el `projectId`
@@ -233,9 +238,9 @@ Alcance). Lo que haya que cambiar se reporta en el resumen final, sin llamar a l
 **Este skill sólo actualiza Requerimientos que ya existen -- nunca crea uno nuevo.** Si
 en el paso 3 detectaste algo que no matchea ningún Requerimiento del paso 2, no lo crees
 acá: reportalo en el resumen final como "Requerimiento nuevo pendiente de crear vía
-`/scrum-sync`" (con la Historia de Usuario resuelta en el paso 3 y una descripción clara)
+`/dev-sync`" (con la Historia de Usuario resuelta en el paso 3 y una descripción clara)
 -- crear Requerimientos nuevos es territorio de developer/Project Manager con
-`/scrum-sync` (paso 4.5 de ese skill), no de este.
+`/dev-sync` (paso 4.5 de ese skill), no de este.
 
 Para cada Requerimiento con match, actualizar sólo lo que cambió:
 
@@ -298,7 +303,7 @@ Reportarle al usuario, en texto, no en JSON crudo:
 - Cuántos Requerimientos se borraron, y cuáles (código + nombre).
 - Qué Requerimientos nuevos quedaron pendientes de crear (no se crean acá), con la
   Historia de Usuario a la que corresponden — para que developer/Project Manager los
-  cree con `/scrum-sync`.
+  cree con `/pm-sync` o `/sm-sync`.
 - Qué partes del documento quedaron "sin Historia de Usuario clara" (para que se sepa qué
   revisar o crear esa Historia primero).
 
@@ -315,7 +320,7 @@ Reportarle al usuario, en texto, no en JSON crudo:
   sólo en el chat es una Historia que el equipo no ve en la app. Lo mismo si la edita de
   palabra. Borrar es la excepción de siempre: confirmación explícita antes del DELETE.
 - **Nunca crear un Requerimiento nuevo desde este skill** -- sí se creaban en una versión
-  anterior; ahora ese alta es exclusivamente de `/scrum-sync` (developer/Project Manager,
+  anterior; ahora ese alta es exclusivamente de `/pm-sync` y `/sm-sync` (Project Manager y Scrum Master,
   paso 4.5 de ese skill). Acá sólo se actualizan/borran los que ya existen y se reporta al
   final cuáles faltarían crear.
 - Nunca borrar una Historia de Usuario o un Requerimiento sin haberle mostrado antes al
@@ -328,5 +333,5 @@ Reportarle al usuario, en texto, no en JSON crudo:
 - Todas las respuestas de error de la API vienen como `{"error": "..."}` — mostrar ese
   mensaje tal cual, no reinterpretarlo.
 - `scrumDocs/po-manifest.json` es propio de este skill — no confundirlo ni fusionarlo con
-  `scrumDocs/scrum-manifest.json` (ese lo usa `/scrum-sync` del lado del developer, con otro
+  `scrumDocs/scrum-manifest.json` (ese lo usa `/dev-sync` del lado del developer, con otro
   significado de `sourceRef`).
