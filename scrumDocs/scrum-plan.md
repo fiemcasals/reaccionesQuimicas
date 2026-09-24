@@ -1,6 +1,6 @@
 # Plan de Requerimientos — simulador quimico
 
-_Generado automáticamente el 2026-09-24T19:40:32.867Z — no editar a mano, se sobreescribe en cada publicación._
+_Generado automáticamente el 2026-09-24T19:58:12.441Z — no editar a mano, se sobreescribe en cada publicación._
 
 Orden sugerido de desarrollo (respeta dependencias entre Requerimientos). Cada fila indica de qué Requerimientos depende, si tiene.
 
