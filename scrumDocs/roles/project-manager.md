@@ -1,6 +1,6 @@
 # Project Manager — qué podés hacer en este proyecto
 
-_Generado automáticamente el 2026-09-24T19:40:47.334Z -- no editar a mano, se sobreescribe en cada publicación._
+_Generado automáticamente el 2026-09-24T19:58:25.862Z -- no editar a mano, se sobreescribe en cada publicación._
 
 Este es el documento de **tu** rol. El procedimiento paso a paso está en
 `.claude/skills/pm-sync/SKILL.md`.
